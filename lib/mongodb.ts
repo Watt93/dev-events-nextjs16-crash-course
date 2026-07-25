@@ -1,13 +1,5 @@
 import mongoose, { Mongoose } from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  throw new Error(
-    "Please define the MONGODB_URI environment variable inside .env.local"
-  );
-}
-
 // Shape of the cached connection we stash on the Node.js global object.
 interface MongooseCache {
   conn: Mongoose | null;
@@ -45,6 +37,14 @@ export async function connectToDatabase(): Promise<Mongoose> {
   // concurrent callers await the same connection instead of racing to
   // create multiple ones.
   if (!cached.promise) {
+    const MONGODB_URI = process.env.MONGODB_URI;
+
+    if (!MONGODB_URI) {
+      throw new Error(
+        "Please define the MONGODB_URI environment variable inside .env.local"
+      );
+    }
+
     cached.promise = mongoose.connect(MONGODB_URI, {
       bufferCommands: false,
     });
